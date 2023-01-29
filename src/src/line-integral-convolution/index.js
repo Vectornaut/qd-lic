@@ -129,11 +129,72 @@ function run (regl) {
       uniform float uDt;
       uniform float uAspect;
 
+      // --- complex arithmetic ---
+
+      const vec2 ZERO = vec2(0.);
+      const vec2 ONE  = vec2(1., 0.);
+      const vec2 I    = vec2(0., 1.);
+
+      //  the complex conjugate of z
+      vec2 conj(vec2 z) {
+        return vec2(z.x, -z.y);
+      }
+
+      // multiplication by z
+      mat2 mul(vec2 z) {
+        return mat2(z, conj(z).yx);
+      }
+
+      // the product of z and w
+      vec2 mul(vec2 z, vec2 w) {
+        return mul(z) * w;
+      }
+
+      // the reciprocal of z
+      vec2 rcp(vec2 z) {
+        // 1/z = z'/(z'*z) = z'/|z|^2
+        return conj(z) / dot(z, z);
+      }
+
+      // the square root of z, from the complex arithmetic code listing in
+      // Appendix C of _Numerical Recipes in C_
+      //
+      // William Press, Saul Teukolsky, William Vetterling, and Brian Flannery,
+      // _Numerical Recipes in C_, 2nd edition. Cambridge University Press, 1992
+      //
+      vec2 csqrt(vec2 z) {
+        // sqrt(0) = 0
+        if (z.x == 0. && z.y == 0.) {
+          return vec2(0.);
+        }
+        
+        // calculate w
+        vec2 a = abs(z);
+        float w;
+        if (a.x >= a.y) {
+          float sl = a.y / a.x;
+          w = sqrt(a.x) * sqrt(0.5*(1. + sqrt(1. + sl*sl)));
+        } else {
+          float sl = a.x / a.y;
+          w = sqrt(a.y) * sqrt(0.5*(sl + sqrt(1. + sl*sl)));
+        }
+        
+        // construct output
+        if (z.x >= 0.) {
+          return vec2(w, z.y / (2.*w));
+        } else if (z.y >= 0.) {
+          return vec2(z.y/(2.*w), w);
+        } else {
+          return -vec2(z.y/(2.*w), w);
+        }
+      }
+
+      // --- vector field ---
+
       vec2 dfdt (vec2 f) {
-        /*vec2 v = vec2(snoise(vec3(f * 2.5 * uNoiseScale, uZ)), snoise(vec3(f * 2.5 * uNoiseScale + 0.8, uZ)));
-        v.x += 0.5;
-        v.y += 0.1;*/
-        vec2 v = f - vec2(0.5);
+        vec2 z = f - vec2(0.5);
+        vec2 v = csqrt(rcp(z));
+        /*vec2 v = rcp(z);*/
         float mag = 3.*smoothstep(0.0, 0.0003, dot(v, v));
         return mag * normalize(v);
       }

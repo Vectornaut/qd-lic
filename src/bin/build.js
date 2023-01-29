@@ -11,8 +11,6 @@ const glslify = require('glslify');
 const mkdirp = require('mkdirp');
 const assert = require('assert');
 const babelify = require('babelify');
-//const es2040 = require('es2040');
-const Idyll = require('idyll');
 const path = require('path');
 const rmrf = require('rimraf');
 const brfs = require('brfs');
@@ -27,46 +25,6 @@ const outputDir = projectDir.replace(/^src\//, '../');
 console.log('Building ', projectDir);
 
 switch (entryFile.type) {
-  case 'idl':
-
-    // Check for html template:
-    var templatePath = path.join(__dirname, '..', projectDir, '_index.html');
-    if (!fs.existsSync(templatePath)) {
-      templatePath = path.join(__dirname, '..', 'templates', '_index.html');
-    }
-
-    const idyll = Idyll({
-      inputFile: path.join(__dirname, '..', projectDir, entryFile.name),
-      defaultComponents: path.join(__dirname, '..', 'lib', 'default-idyll-components'),
-      components: path.join(__dirname, '..', projectDir, 'components'),
-      output: path.join(__dirname, '..', outputDir),
-      outputJS: '../index.js',
-      //css: path.join(__dirname, '..', 'lib', 'css', 'styles.css'),
-      template: templatePath,
-      watch: false,
-      minify: true,
-      ssr: true,
-      theme: 'none',
-      layout: 'none',
-      transform: ['glslify']
-    });
-
-    idyll.build();
-
-    ['static', 'fonts', 'js', 'css', 'fonts'].forEach(dir => {
-      var cpInputDir = path.join(__dirname, '..', projectDir, dir);
-      var cpOutputDir = path.join(__dirname, '..', outputDir, dir);
-
-      if (fs.existsSync(cpInputDir)) {
-        console.log('copying', dir);
-        cpr(cpInputDir, cpOutputDir, {});
-      }
-    });
-
-    fs.createReadStream(path.join(__dirname, '..', 'lib', 'css', 'styles.css'))
-      .pipe(fs.createWriteStream(path.join(outputDir, '..', 'styles.css')));
-
-    break;
   case 'html':
     break;
   case 'js':

@@ -1,5 +1,0 @@
-{
-  "title": "Erosion",
-  "description": "An ad-hoc particle-based terrain erosion algorithm, computed on the GPU",
-  "order": 100
-}

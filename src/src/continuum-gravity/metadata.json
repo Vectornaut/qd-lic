@@ -1,5 +1,0 @@
-{
-  "title": "Continuum Gravity",
-  "description": "One million particles interacting gravitationally via a Poisson equation solved on a 2D grid",
-  "order": 1000 
-}

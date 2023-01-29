@@ -33,14 +33,14 @@ require('regl')({
 function run (regl) {
   var state = {
     alpha: 0.4,
-    steps: 5,
-    width: 3.0,
+    steps: 8,
+    width: 1.5,
     noiseScale: 1.5,
     noiseSpeed: 0.8,
     resolution: 128,
     modulation: 0.75,
     modulationFrequency: 0.8,
-    modulationSpeed: 1.3,
+    modulationSpeed: 0.5,
   };
 
   var screenWidth, screenHeight, h, w, licRadius, dt, alpha;
@@ -120,18 +120,21 @@ function run (regl) {
     frag: glsl`
       precision highp float;
 
-      #pragma glslify: snoise = require(glsl-noise/simplex/3d)
+      /*#pragma glslify: snoise = require(glsl-noise/simplex/3d)*/
 
       varying vec2 uv;
       uniform sampler2D src;
-      uniform float uZ, uDt;
-      uniform float uAspect, uNoiseScale;
+      /*uniform float uZ, uDt;
+      uniform float uAspect, uNoiseScale;*/
+      uniform float uDt;
+      uniform float uAspect;
 
       vec2 dfdt (vec2 f) {
-        vec2 v = vec2(snoise(vec3(f * 2.5 * uNoiseScale, uZ)), snoise(vec3(f * 2.5 * uNoiseScale + 0.8, uZ)));
+        /*vec2 v = vec2(snoise(vec3(f * 2.5 * uNoiseScale, uZ)), snoise(vec3(f * 2.5 * uNoiseScale + 0.8, uZ)));
         v.x += 0.5;
-        v.y += 0.1;
-        float mag = smoothstep(0.0, 0.0003, dot(v, v));
+        v.y += 0.1;*/
+        vec2 v = f - vec2(0.5);
+        float mag = 3.*smoothstep(0.0, 0.0003, dot(v, v));
         return mag * normalize(v);
       }
 

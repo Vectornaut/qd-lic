@@ -290,7 +290,8 @@ function run (regl) {
   });
 
   function kernel (x) {
-    return Math.exp(-Math.pow(x / 0.4, 2.0) * 0.5);
+    const k = 0.5 / (0.4 * 0.4);
+    return Math.exp(-k*x*x);
   }
   
   regl.frame(({tick}) => {
